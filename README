@@ -1,0 +1,61 @@
+NAME
+    IO::Barf - Barfing content to output file.
+
+SYNOPSIS
+     use IO::Barf qw(barf);
+     barf($file, 'CONTENT');
+
+SUBROUTINES
+    "barf($file, $content)"
+             Barf content to file.
+
+ERRORS
+     barf():
+             Cannot open file '%s'.
+             Cannot close file '%s'.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Module.
+     use File::Temp qw(tempfile);
+     use IO::Barf qw(barf);
+
+     # Content.
+     my $content = "foo\nbar\n";
+
+     # Temporary file.
+     my $temp_file = File::Temp->new->filename;
+
+     # Barf out.
+     barf($temp_file, $content);
+
+     # Print tempory file.
+     system("cat $temp_file");
+
+     # Output:
+     # foo
+     # bar
+
+DEPENDENCIES
+    Error::Pure, Exporter, Readonly.
+
+SEE ALSO
+    IO::Any, File::Slurp, Perl6::Slurp.
+
+REPOSITORY
+    <https://github.com/tupinek/IO-Barf>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    BSD license.
+
+VERSION
+    0.01
+
