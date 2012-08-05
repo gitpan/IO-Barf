@@ -10,10 +10,10 @@ use Error::Pure qw(err);
 use Readonly;
 
 # Constants.
-Readonly::Array our @EXPORT_OK => qw(barf);
+Readonly::Array our @EXPORT => qw(barf);
 
 # Version.
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Barf content to file.
 sub barf {
@@ -65,7 +65,7 @@ IO::Barf - Barfing content to output file.
 
  # Module.
  use File::Temp qw(tempfile);
- use IO::Barf qw(barf);
+ use IO::Barf;
 
  # Content.
  my $content = "foo\nbar\n";
@@ -78,6 +78,9 @@ IO::Barf - Barfing content to output file.
 
  # Print tempory file.
  system("cat $temp_file");
+
+ # Unlink temporary file.
+ unlink $temp_file;
 
  # Output:
  # foo
@@ -111,6 +114,6 @@ BSD license.
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut
