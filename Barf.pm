@@ -8,19 +8,39 @@ use warnings;
 # Modules.
 use Error::Pure qw(err);
 use Readonly;
+use UNIVERSAL qw(isa);
 
 # Constants.
 Readonly::Array our @EXPORT => qw(barf);
 
 # Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Barf content to file.
 sub barf {
-	my ($file, $content) = @_;
-	open my $ouf, '>', $file or err "Cannot open file '$file'.";
-	print {$ouf} $content;
-	close $ouf or err "Cannot close file '$file'.";
+	my ($file_or_handler, $content) = @_;
+
+	# File.
+	my $ref = ref $file_or_handler;
+	if (! $ref) {
+		open my $ouf, '>', $file_or_handler
+			or err "Cannot open file '$file_or_handler'.";
+		print {$ouf} $content;
+		close $ouf or err "Cannot close file '$file_or_handler'.";
+
+	# Handler
+	} elsif ($ref eq 'GLOB') {
+		print {$file_or_handler} $content;
+
+	# IO::Handle.
+	} elsif (isa($file_or_handler, 'IO::Handle')) {
+		$file_or_handler->print($content);
+
+	# Other.
+	} else {
+		err "Unsupported object '$ref'.";
+	}
+
 	return;
 }
 
@@ -39,15 +59,15 @@ IO::Barf - Barfing content to output file.
 =head1 SYNOPSIS
 
  use IO::Barf qw(barf);
- barf($file, 'CONTENT');
+ barf($file_or_handler, 'CONTENT');
 
 =head1 SUBROUTINES
 
 =over 8
 
-=item C<barf($file, $content)>
+=item C<barf($file_or_handler, $content)>
 
- Barf content to file.
+ Barf content to file or handler.
 
 =back
 
@@ -56,15 +76,16 @@ IO::Barf - Barfing content to output file.
  barf():
          Cannot open file '%s'.
          Cannot close file '%s'.
+         Unsupported object '%s'.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
  # Pragmas.
  use strict;
  use warnings;
 
  # Module.
- use File::Temp qw(tempfile);
+ use File::Temp;
  use IO::Barf;
 
  # Content.
@@ -85,6 +106,68 @@ IO::Barf - Barfing content to output file.
  # Output:
  # foo
  # bar
+
+=head1 EXAMPLE2
+
+ # Pragmas.
+ use strict;
+ use warnings;
+
+ # Module.
+ use IO::Barf;
+
+ # Content.
+ my $content = "foo\nbar\n";
+
+ # Barf out.
+ barf(\*STDOUT, $content);
+
+ # Output:
+ # foo
+ # bar
+
+=head1 EXAMPLE3
+
+ # Pragmas.
+ use strict;
+ use warnings;
+
+ # Module.
+ use Benchmark qw(cmpthese);
+ use IO::Any;
+ use IO::Barf;
+ use File::Slurp qw(write_file);
+ use File::Temp;
+
+ # Temporary files.
+ my $temp1 = File::Temp->new->filename;
+ my $temp2 = File::Temp->new->filename;
+ my $temp3 = File::Temp->new->filename;
+
+ # Some data.
+ my $data = 'x' x 1000;
+
+ # Benchmark (10s).
+ cmpthese(-10, {
+         'IO::Any' => sub {
+                 IO::Any->spew($temp2, $data);
+                 unlink $temp2;
+         },
+         'IO::Barf' => sub {
+                 barf($temp1, $data);
+                 unlink $temp1;
+         },
+         'File::Slurp' => sub {
+                 write_file($temp3, $data);
+                 unlink $temp3;
+         },
+ });
+
+ # Output like this:
+ #                Rate     IO::Any File::Slurp    IO::Barf
+ # IO::Any      6382/s          --        -24%        -48%
+ # File::Slurp  8367/s         31%          --        -32%
+ # IO::Barf    12268/s         92%         47%          --
 
 =head1 DEPENDENCIES
 
@@ -114,6 +197,6 @@ BSD license.
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

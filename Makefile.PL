@@ -19,14 +19,16 @@ resources 'homepage' => 'https://github.com/tupinek/IO-Barf';
 resources 'repository' => 'git://github.com/tupinek/IO-Barf';
 test_requires 'Digest' => 0;
 test_requires 'English' => 0;
+test_requires 'Error::Pure' => 0.08;
 test_requires 'File::Object' => 0.05;
 test_requires 'File::Slurp' => 0;
 test_requires 'File::Temp' => 0;
+test_requires 'IO::File' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::Pod' => 0;
 test_requires 'Test::Pod::Coverage' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();
