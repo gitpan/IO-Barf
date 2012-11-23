@@ -8,13 +8,13 @@ use warnings;
 # Modules.
 use Error::Pure qw(err);
 use Readonly;
-use UNIVERSAL qw(isa);
+use Scalar::Util qw(blessed);
 
 # Constants.
 Readonly::Array our @EXPORT => qw(barf);
 
 # Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Barf content to file.
 sub barf {
@@ -33,12 +33,14 @@ sub barf {
 		print {$file_or_handler} $content;
 
 	# IO::Handle.
-	} elsif (isa($file_or_handler, 'IO::Handle')) {
+	} elsif (blessed($file_or_handler)
+		&& $file_or_handler->isa('IO::Handle')) {
+
 		$file_or_handler->print($content);
 
 	# Other.
 	} else {
-		err "Unsupported object '$ref'.";
+		err "Unsupported reference '$ref'.";
 	}
 
 	return;
@@ -76,7 +78,7 @@ IO::Barf - Barfing content to output file.
  barf():
          Cannot open file '%s'.
          Cannot close file '%s'.
-         Unsupported object '%s'.
+         Unsupported reference '%s'.
 
 =head1 EXAMPLE1
 
@@ -98,7 +100,7 @@ IO::Barf - Barfing content to output file.
  barf($temp_file, $content);
 
  # Print tempory file.
- system("cat $temp_file");
+ system "cat $temp_file";
 
  # Unlink temporary file.
  unlink $temp_file;
@@ -173,7 +175,8 @@ IO::Barf - Barfing content to output file.
 
 L<Error::Pure>,
 L<Exporter>,
-L<Readonly>.
+L<Readonly>,
+L<Scalar::Util>.
 
 =head1 SEE ALSO
 
@@ -197,6 +200,6 @@ BSD license.
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

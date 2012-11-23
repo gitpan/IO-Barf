@@ -1,3 +1,8 @@
+0.04 (November 23, 2012)
+- Add missing messages to tests.
+- Improve error message.
+- Remove obsolete UNIVERSAL::isa().
+
 0.03 (August 23, 2012)
 - Fix doc example.
 - Fix tests.
