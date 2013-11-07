@@ -14,6 +14,7 @@ requires 'Error::Pure' => 0.11;
 requires 'Exporter' => 0;
 requires 'Readonly' => 0;
 requires 'Scalar::Util' => 0;
+requires 'perl' => '5.6.2';
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=IO-Barf';
 resources 'homepage' => 'https://github.com/tupinek/IO-Barf';
@@ -30,7 +31,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Pod' => 0;
 test_requires 'Test::Pod::Coverage' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();
